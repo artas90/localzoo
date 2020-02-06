@@ -1,0 +1,18 @@
+# compiled output
+/bin
+*.tgz
+
+# dependencies
+/node_modules
+
+# IDEs and editors
+/.idea
+/.vscode
+
+# misc
+npm-debug.log
+package-lock.json
+
+# System Files
+.DS_Store
+Thumbs.db

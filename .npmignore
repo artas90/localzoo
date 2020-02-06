@@ -1,0 +1,5 @@
+src
+.editorconfig
+.gitattributes
+tsconfig.json
+localzoo-*.tgz

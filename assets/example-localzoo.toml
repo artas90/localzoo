@@ -1,0 +1,25 @@
+[sample-microservice]
+## comment or delete to include config
+disabled = true
+
+runCmd = "npm run start"
+baseUrl = "/microservice/path/"
+
+## uncomment when external dependency is deployed somewhere
+# targetHost = "http://some.deployed.api/v1"
+
+## uncomment when dev server is started on localhost
+# targetPort = 4810
+
+## uncomment to show link on welcome page
+# entryUrl = "/microservice/path/some-page"
+
+## uncomment if there is dependency on another build or project
+# waitProject = "lib-dependency"
+# waitFile = "dist/lib-dependency/package.json"
+# waitDelay = 10000
+
+## uncomment if there is dependency on another build or project
+# [lib-dependency]
+# rootDir = "../lib-dependency"
+# runCmd = "npm run build-lib"

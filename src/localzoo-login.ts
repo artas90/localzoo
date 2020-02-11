@@ -2,12 +2,12 @@
 import yargs from 'yargs';
 import express from 'express';
 import bodyParser from 'body-parser';
-import { template, filter } from 'lodash';
+import { template, filter, isEmpty } from 'lodash';
 import { ISharedArgv, sharedArgvBuilder } from './utils/shared-argv';
 import { loadProjects, IProjectConfig } from './utils/projects';
 import { FgMagenta, ResetColors } from './utils/common';
 
-const uiProjects = filter(loadProjects(), (project: IProjectConfig) => !!project.entryUrl && !project.disabled);
+const uiProjects = filter(loadProjects(), (project: IProjectConfig) => !isEmpty(project.urlShortcuts) && !project.disabled);
 
 const bookmarklet = (code: string): string => code.trim().split('\n').map(line => line.trim()).join(' ');
 
@@ -47,8 +47,13 @@ const welcomePageTmpl = template(`
   <% } %>
 
   <% uiProjects.forEach(function(project) { %>
-    <strong><%= project.name %></strong><br/>
-    <a href="<%= project.entryUrl %>"><%= project.entryUrl %></a><br/><br/>
+    <strong><%= project.name %></strong><br/><br/>
+
+    <% project.urlShortcuts.forEach(function(shortcut) { %>
+      <span><%= shortcut.name %></span></br>
+      <a href="<%= shortcut.url %>"><%= shortcut.url %></a><br/><br/>
+    <% }); %>
+
   <% }); %>
 </body>
 </html>

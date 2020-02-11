@@ -3,7 +3,16 @@ import yargs from 'yargs';
 import waitOn from 'wait-on';
 import { get } from 'lodash';
 import { join } from 'path';
-import { loadProjects, IProjectConfigMap } from './utils/projects';
+import { loadProjects, IProjectConfigMap, IProjectConfig } from './utils/projects';
+
+function getWaitFile(projects: IProjectConfigMap, projectCurrent: IProjectConfig): string {
+  const projectToWaitName = get(projectCurrent, 'waitProject', null) as string;
+  const projectToWait = projectToWaitName && projects[projectToWaitName];
+
+  return (projectToWait && !projectToWait.disabled)
+    ? join(projectToWait.rootDir, get(projectCurrent, 'waitFile', ''))
+    : null;
+}
 
 function toWaitOnConfig(projects: IProjectConfigMap, projectCurrName: string) {
   const projectCurrent = projects[projectCurrName];
@@ -11,14 +20,8 @@ function toWaitOnConfig(projects: IProjectConfigMap, projectCurrName: string) {
     return null;
   }
 
-  const projectToWaitName = get(projectCurrent, 'waitProject', null) as string;
-  const projectToWait = projectToWaitName && projects[projectToWaitName];
-  if (!projectToWait || projectToWait.disabled) {
-    return null;
-  }
-
   const delay = get(projectCurrent, 'waitDelay', 0) as number;
-  const waitFile = join(projectToWait.rootDir, get(projectCurrent, 'waitFile', ''));
+  const waitFile = getWaitFile(projects, projectCurrent);
   if (delay === 0 && !waitFile) {
     return null;
   }

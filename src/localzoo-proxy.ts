@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import yargs from 'yargs';
 import http from 'http';
-import httpProxy from 'http-proxy';
+import HttpProxy from 'http-proxy';
 import HttpProxyRules from 'http-proxy-rules';
 import { fromPairs, map, compact, trimStart } from 'lodash';
 import { ISharedArgv, sharedArgvBuilder } from './utils/shared-argv';
@@ -32,24 +32,35 @@ const toHttpProxyRules = (projects: IProjectConfigMap, argv: ISharedArgv) => ({
   default: `http://localhost:${argv.loginPort}`
 });
 
-function runProxy(argv: ISharedArgv) {
+const proxyListener = (
+  proxy: HttpProxy,
+  rules: HttpProxyRules,
+  req: http.IncomingMessage,
+  res: http.ServerResponse
+) => {
+  const target = rules.match(req);
+  if (target) {
+    return proxy.web(req, res, {target, secure: false});
+  }
+  throw new Error('No url match found');
+}
+
+const proxyErrorHandler = (err: Error, req: http.IncomingMessage, res: http.ServerResponse) => {
+  res.writeHead(500, { 'Content-Type': 'text/plain' });
+  res.end('The request url and path can\'t be reached!');
+}
+
+const runProxy = (argv: ISharedArgv) => {
   const projects = loadProjects();
-  const reverseProxy = httpProxy.createProxy();
+  const proxy = HttpProxy.createProxy();
   const rules = toHttpProxyRules(projects, argv);
   const proxyRules = new HttpProxyRules(rules);
 
   console.log(`* Dev proxy started at http://localhost:${argv.proxyPort} *`);
   console.log(objToString(rules));
-  
-  http.createServer((req, res) => {
-    const target = proxyRules.match(req);
-    if (target) {
-      return reverseProxy.web(req, res, {target, secure: false});
-    }
-  
-    res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end('The request url and path did not match any of the listed rules!');
-  }).listen(argv.proxyPort);
+
+  proxy.on('error', proxyErrorHandler);
+  http.createServer((req, res) => proxyListener(proxy, proxyRules, req, res)).listen(argv.proxyPort);
 }
 
 yargs

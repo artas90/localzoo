@@ -3,6 +3,11 @@ import { join, dirname } from 'path';
 import { flow, mapValues } from 'lodash';
 import { lsDirs, mergeDicts, readToml } from './common';
 
+export interface IProjectUrlShortcut {
+  name: string;
+  url: string;
+}
+
 // See example in assets/example-localzoo.toml
 export interface IProjectConfig {
   name: string;
@@ -17,7 +22,7 @@ export interface IProjectConfig {
   targetHost?: string;
   targetPort?: number;
 
-  entryUrl?: boolean;
+  urlShortcuts?: IProjectUrlShortcut[];
 
   waitProject?: string;
   waitFile?: string
@@ -42,7 +47,7 @@ const readProjectConfigs = (filePath: string): IProjectConfigMap | null =>
 
 const loadProjectsFromDir: (dirPath: string) => IProjectConfigMap = flow(
   dirPath => [dirPath, ...lsDirs(dirPath)],
-  dirPaths => dirPaths.map(dir => join(dir, '.localzoo.toml')),
+  dirPaths => dirPaths.map(dir => join(dir, 'localzoo.toml')),
   configPaths => configPaths.map(readProjectConfigs),
   mergeDicts
 );

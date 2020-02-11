@@ -16,10 +16,10 @@ const toConcurrently = (project: IProjectConfig) =>
 
 const runInitConfig = () => {
   const copyFrom = join(__dirname, '../assets/example-localzoo.toml');
-  const copyTo = join(process.cwd(), './.localzoo.toml');
+  const copyTo = join(process.cwd(), './localzoo.toml');
 
   if (existsSync(copyTo)) {
-    console.log(`File '.localzoo.toml' is already exists in this dir`);
+    console.log(`File 'localzoo.toml' is already exists in this dir`);
     return;
   }
 
@@ -27,23 +27,29 @@ const runInitConfig = () => {
   console.log(`File '${copyTo}' created`);
 };
 
-const runConcurrently = (argv: ISharedArgv) => concurrently(
-  [
-    ...map(loadProjects(), toConcurrently).filter(Boolean),
-    {
-      name: 'localzoo-proxy',
-      command: `cd ${process.cwd()} && localzoo-proxy ${sharedArgvStringify(argv)}`
-    },
-    {
-      name: 'localzoo-login',
-      command: `localzoo-login ${sharedArgvStringify(argv)}`
-    }
-  ],
-  {
-    prefix: 'name'
-  }
-);
+export const runConcurrently = (argv: ISharedArgv) => {
+  process.on('SIGINT', () => {
+    console.log("Caught interrupt signal");
+    process.exit();
+  });
 
+  concurrently(
+    [
+      ...map(loadProjects(), toConcurrently).filter(Boolean),
+      {
+        name: 'localzoo-proxy',
+        command: `cd ${process.cwd()} && localzoo-proxy ${sharedArgvStringify(argv)}`
+      },
+      {
+        name: 'localzoo-login',
+        command: `localzoo-login ${sharedArgvStringify(argv)}`
+      }
+    ],
+    {
+      prefix: 'name'
+    }
+  );
+}
 const runDiscover = () => {
   const projects = loadProjects();
   const enabledProjects = filter(projects, (project: IProjectConfig) => !project.disabled);
@@ -52,11 +58,6 @@ const runDiscover = () => {
   console.log(`${FgGreen}* Enabled Projects *${ResetColors}\n${objToString(enabledProjects)}`);
   console.log(`${FgRed}* Disabled Projects *${ResetColors}\n${objToString(disabledProjects)}`);
 }
-
-process.on('SIGINT', () => {
-  console.log("Caught interrupt signal");
-  process.exit();
-});
 
 yargs
   .scriptName('localzoo')

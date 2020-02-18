@@ -8,7 +8,7 @@ import { ISharedArgv, sharedArgvBuilder } from './utils/shared-argv';
 import { objToString } from './utils/common';
 import { loadProjects, IProjectConfig, IProjectConfigMap } from './utils/projects';
 
-function toHttpRulePair(project: IProjectConfig): [string, string] {
+const toHttpRulePair = (project: IProjectConfig): [string, string] => {
   if (project.disabled || !project.baseUrl) {
     return null;
   }

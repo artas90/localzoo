@@ -1,6 +1,6 @@
 {
   "name": "localzoo",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Utility to run multiple microservices at localhost alongside with proxy",
   "author": "Andrii Sokolov <artas90@gmail.com>",
   "license": "GPL-3.0-or-later",
@@ -19,7 +19,8 @@
     "compile": "tsc --outDir bin",
     "build": "npm run clean && npm run compile",
     "relink": "npm run build && npm link",
-    "watch": "tsc --watch --outDir bin"
+    "watch": "tsc --watch --outDir bin",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

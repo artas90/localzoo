@@ -87,7 +87,7 @@ const redirectPage = (req: express.Request) => {
   });
 };
 
-function runLoginServer(argv: ISharedArgv) {
+const runLoginServer = (argv: ISharedArgv) => {
   const app = express();
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));

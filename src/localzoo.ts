@@ -27,7 +27,9 @@ const runInitConfig = () => {
   console.log(`File '${copyTo}' created`);
 };
 
-export const runConcurrently = (argv: ISharedArgv) => {
+const runConcurrently = (argv: ISharedArgv) => {
+  const projects = loadProjects();
+
   process.on('SIGINT', () => {
     console.log("Caught interrupt signal");
     process.exit();
@@ -35,7 +37,7 @@ export const runConcurrently = (argv: ISharedArgv) => {
 
   concurrently(
     [
-      ...map(loadProjects(), toConcurrently).filter(Boolean),
+      ...map(projects, toConcurrently).filter(Boolean),
       {
         name: 'localzoo-proxy',
         command: `cd ${process.cwd()} && localzoo-proxy ${sharedArgvStringify(argv)}`
@@ -50,6 +52,7 @@ export const runConcurrently = (argv: ISharedArgv) => {
     }
   );
 }
+
 const runDiscover = () => {
   const projects = loadProjects();
   const enabledProjects = filter(projects, (project: IProjectConfig) => !project.disabled);

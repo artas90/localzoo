@@ -5,7 +5,7 @@ import { get } from 'lodash';
 import { join } from 'path';
 import { loadProjects, IProjectConfigMap, IProjectConfig } from './utils/projects';
 
-function getWaitFile(projects: IProjectConfigMap, projectCurrent: IProjectConfig): string {
+const getWaitFile = (projects: IProjectConfigMap, projectCurrent: IProjectConfig): string => {
   const projectToWaitName = get(projectCurrent, 'waitProject', null) as string;
   const projectToWait = projectToWaitName && projects[projectToWaitName];
 
@@ -14,7 +14,7 @@ function getWaitFile(projects: IProjectConfigMap, projectCurrent: IProjectConfig
     : null;
 }
 
-function toWaitOnConfig(projects: IProjectConfigMap, projectCurrName: string) {
+const toWaitOnConfig = (projects: IProjectConfigMap, projectCurrName: string) => {
   const projectCurrent = projects[projectCurrName];
   if (!projectCurrent) {
     return null;
@@ -29,10 +29,10 @@ function toWaitOnConfig(projects: IProjectConfigMap, projectCurrName: string) {
   return { delay, resources: [ waitFile ] };
 }
 
-export const waitOnArgvBuilder = (argv: yargs.Argv) => {
+const waitOnArgvBuilder = (argv: yargs.Argv) => {
   argv.default('project-name', null);
 };
-async function runWaitOn() {
+const runWaitOn = async () => {
   const projects = loadProjects();
   const projectName = yargs.argv.projectName as string;
 

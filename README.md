@@ -11,7 +11,7 @@ localzoo <command>
 
 Commands:
   localzoo init      init config in current dir
-  localzoo up        start all microservices and proxy
+  localzoo start     start all microservices and proxy
   localzoo discover  just find and show project configs
 
 Options:

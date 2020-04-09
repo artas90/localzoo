@@ -9,15 +9,16 @@ import { objToString } from './utils/common';
 import { loadProjects, IProjectConfig, IProjectConfigMap } from './utils/projects';
 
 const toHttpRulePair = (project: IProjectConfig): [string, string] => {
-  if (project.disabled || !project.baseUrl) {
+  const { proxy } = project;
+  if (project.disabled || !proxy || !proxy.baseUrl) {
     return null;
   }
 
-  const baseUrl = '/' + trimStart(project.baseUrl, '/');
+  const baseUrl = '/' + trimStart(proxy.baseUrl, '/');
 
   const target = [
-    project.targetHost || 'http://localhost',
-    project.targetPort ? `:${project.targetPort}` : '',
+    proxy.targetHost || 'http://localhost',
+    proxy.targetPort ? `:${proxy.targetPort}` : '',
     baseUrl 
   ].join('');
 
@@ -40,7 +41,7 @@ const proxyListener = (
 ) => {
   const target = rules.match(req);
   if (target) {
-    return proxy.web(req, res, {target, secure: false});
+    return proxy.web(req, res, {target});
   }
   throw new Error('No url match found');
 }
@@ -51,8 +52,8 @@ const proxyErrorHandler = (err: Error, req: http.IncomingMessage, res: http.Serv
 }
 
 const runProxy = (argv: ISharedArgv) => {
-  const projects = loadProjects();
-  const proxy = HttpProxy.createProxy();
+  const projects = loadProjects(argv.group);
+  const proxy = HttpProxy.createProxy({ secure: false, changeOrigin: true });
   const rules = toHttpProxyRules(projects, argv);
   const proxyRules = new HttpProxyRules(rules);
 

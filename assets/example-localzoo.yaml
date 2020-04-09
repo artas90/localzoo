@@ -1,0 +1,37 @@
+$groups:
+  sample-group: [ ~common-service, sample-microservice ]
+  micro2: [ ~common-label, microservice-2 ]
+
+sample-microservice:
+  disabled: true # comment or delete to include config
+  wait: # optional: if there is dependency on another build or project
+    delay: 10000
+    resources:
+      - { project: 'lib-dependency', file: 'dist/lib-dependency/package.json' }
+  scripts: # optional: when local build is required
+    start: 'npm run start' # name 'start' is required in a 'scripts' section
+  proxy: # optional: add current service to proxy configuration
+    baseUrl: '/microservice/path/'
+    targetHost: 'http://some.deployed.api' # use when external dependency is deployed somewhere
+    targetPort: 4810 # use when dev server is started on localhost
+  urlShortcuts: # optional: url shortcuts is displayed on welcome page
+    - { name: 'page1', url: '/microservice/path/page1' }
+    - { name: 'page2', url: '/microservice/path/page2' }
+
+# optional: uncomment if there is dependency on another build or project
+lib-dependency:
+  disabled: true # comment or delete to include config
+  rootDir: '../lib-dependency'
+  scripts:
+    start: 'npm run build-lib'
+
+microservice-2:
+  disabled: true
+  scripts:
+    start: 'npm run start'
+
+microservice-common:
+  disabled: true
+  labels: [ 'common-label' ]
+  scripts:
+    start: 'npm run start'

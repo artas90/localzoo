@@ -7,7 +7,9 @@ import { ISharedArgv, sharedArgvBuilder } from './utils/shared-argv';
 import { loadProjects, IProjectConfig } from './utils/projects';
 import { FgMagenta, ResetColors } from './utils/common';
 
-const uiProjects = filter(loadProjects(), (project: IProjectConfig) => !isEmpty(project.urlShortcuts) && !project.disabled);
+
+const getUiProjects = (argv: ISharedArgv) =>
+  filter(loadProjects(argv.group), (cfg: IProjectConfig) => !isEmpty(cfg.urlShortcuts) && !cfg.disabled);
 
 const bookmarklet = (code: string): string => code.trim().split('\n').map(line => line.trim()).join(' ');
 
@@ -58,7 +60,10 @@ const welcomePageTmpl = template(`
 </body>
 </html>
 `);
-const welcomePage = (argv: ISharedArgv) => welcomePageTmpl({ redrectBookmarklet: redrectBookmarklet(argv), uiProjects });
+const welcomePage = (argv: ISharedArgv) => welcomePageTmpl({
+  redrectBookmarklet: redrectBookmarklet(argv),
+  uiProjects: getUiProjects(argv)
+});
 
 const redirectPageTmpl = template(`
 <html>

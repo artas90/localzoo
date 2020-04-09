@@ -1,4 +1,4 @@
-import toml from 'toml';
+import yaml from 'js-yaml';
 import { join } from 'path';
 import { merge } from 'lodash';
 import { readdirSync, statSync, readFileSync } from 'fs';
@@ -7,7 +7,7 @@ export const isDirectory = (pth: string) => statSync(pth).isDirectory();
 
 export const lsDirs = (dirPath: string) => readdirSync(dirPath).map(item => join(dirPath, item)).filter(isDirectory);
 
-export const readToml = (filePath: string) => toml.parse(readFileSync(filePath).toString());
+export const readYaml = (filePath: string) => yaml.safeLoad(readFileSync(filePath).toString());
 
 export const mergeDicts = (dicts: any[]) => merge({}, ...dicts);
 

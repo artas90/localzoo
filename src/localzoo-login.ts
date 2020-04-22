@@ -29,7 +29,7 @@ function redirectPost(url, data) {
   form.submit();
 };
 function objectify(storage) {
-  return Object.keys(storage).reduce((acc, key) => (acc[key] = storage.getItem(key), acc), {});
+  return Object.keys(storage).reduce((acc, key) => (acc[key] = JSON.stringify(storage.getItem(key)), acc), {});
 };
 function getJsonData() {
   return { localStorageData: objectify(window.localStorage), sessionStorageData: objectify(window.sessionStorage) };
@@ -68,15 +68,15 @@ const welcomePage = (argv: ISharedArgv) => welcomePageTmpl({
 const redirectPageTmpl = template(`
 <html>
 <script>
-  const lsData = JSON.parse('<%= localStorageData %>');
-  const ssData = JSON.parse('<%= sessionStorageData %>');
+  const lsData = <%= localStorageData %>;
+  const ssData = <%= sessionStorageData %>;
 
   Object.keys(lsData).forEach(key => {
-    localStorage.setItem(key, lsData[key]);
+    localStorage.setItem(key, JSON.parse(lsData[key]));
   });
 
   Object.keys(ssData).forEach(key => {
-    sessionStorage.setItem(key, ssData[key]);
+    sessionStorage.setItem(key, JSON.parse(ssData[key]));
   });
 
   window.location.href = '/';

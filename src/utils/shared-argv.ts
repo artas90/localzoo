@@ -15,5 +15,8 @@ export const sharedArgvBuilder = (argv: yargs.Argv) => {
   argv.default('group', null);
 };
 
-export const sharedArgvStringify = (argv: ISharedArgv) =>
-  `--proxy-port=${argv.proxyPort} --login-port=${argv.loginPort} --group=${argv.group}`;
+export const sharedArgvStringify = (argv: ISharedArgv) => [
+  `--proxy-port=${argv.proxyPort}`,
+  `--login-port=${argv.loginPort}`,
+  argv.group ? `--group=${argv.group}` : '',
+].join(' ');

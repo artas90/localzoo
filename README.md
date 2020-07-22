@@ -4,6 +4,12 @@
 
 Utility to run multiple microservices at localhost alongside with proxy.
 
+## Instalation
+
+```
+npm i localzoo
+```
+
 ## Usage
 
 ```

@@ -7,7 +7,6 @@ import { ISharedArgv, sharedArgvBuilder } from './utils/shared-argv';
 import { loadProjects, IProjectConfig } from './utils/projects';
 import { FgMagenta, ResetColors } from './utils/common';
 
-
 const getUiProjects = (argv: ISharedArgv) =>
   filter(loadProjects(argv.group), (cfg: IProjectConfig) => !isEmpty(cfg.urlShortcuts) && !cfg.disabled);
 
@@ -65,6 +64,11 @@ const welcomePage = (argv: ISharedArgv) => welcomePageTmpl({
   uiProjects: getUiProjects(argv)
 });
 
+const STORAGE_DATA = {
+  localStorageData: '',
+  sessionStorageData: ''
+};
+
 const redirectPageTmpl = template(`
 <html>
 <script>
@@ -86,10 +90,13 @@ const redirectPageTmpl = template(`
 const redirectPage = (req: express.Request) => {
   const data = JSON.parse(req.body.jsonData);
 
-  return redirectPageTmpl({
-    localStorageData: JSON.stringify(data.localStorageData),
-    sessionStorageData: JSON.stringify(data.sessionStorageData)
-  });
+  STORAGE_DATA.localStorageData = JSON.stringify(data.localStorageData);
+  STORAGE_DATA.sessionStorageData = JSON.stringify(data.sessionStorageData);
+
+  return redirectPageTmpl(STORAGE_DATA);
+};
+const redirectPageCurrent = () => {
+  return redirectPageTmpl(STORAGE_DATA);
 };
 
 const runLoginServer = (argv: ISharedArgv) => {
@@ -97,9 +104,10 @@ const runLoginServer = (argv: ISharedArgv) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  app.get('/',                (req, res) => { res.send(welcomePage(argv)); });
-  app.get('/localzoo-login',  (req, res) => { res.send(welcomePage(argv)); });
-  app.post('/localzoo-login', (req, res) => { res.send(redirectPage(req)); });
+  app.get('/',                        (req, res) => { res.send(welcomePage(argv));     });
+  app.get('/localzoo-login',          (req, res) => { res.send(welcomePage(argv));     });
+  app.post('/localzoo-login',         (req, res) => { res.send(redirectPage(req));     });
+  app.post('/localzoo-login/current', (req, res) => { res.send(redirectPageCurrent()); });
 
   app.listen(argv.loginPort, () => {
     console.log(`\n${FgMagenta}Please open http://localhost:${argv.proxyPort}/localzoo-login and create a redirect button${ResetColors}\n`);

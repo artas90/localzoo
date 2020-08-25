@@ -107,7 +107,7 @@ const runLoginServer = (argv: ISharedArgv) => {
   app.get('/',                        (req, res) => { res.send(welcomePage(argv));     });
   app.get('/localzoo-login',          (req, res) => { res.send(welcomePage(argv));     });
   app.post('/localzoo-login',         (req, res) => { res.send(redirectPage(req));     });
-  app.post('/localzoo-login/current', (req, res) => { res.send(redirectPageCurrent()); });
+  app.get('/localzoo-login/current', (req, res) => { res.send(redirectPageCurrent()); });
 
   app.listen(argv.loginPort, () => {
     console.log(`\n${FgMagenta}Please open http://localhost:${argv.proxyPort}/localzoo-login and create a redirect button${ResetColors}\n`);

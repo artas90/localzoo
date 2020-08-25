@@ -1,6 +1,6 @@
 {
   "name": "localzoo",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Utility to run multiple microservices at localhost alongside with proxy",
   "author": "Andrii Sokolov <artas90@gmail.com>",
   "license": "GPL-3.0-or-later",

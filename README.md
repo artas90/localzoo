@@ -24,3 +24,7 @@ Options:
   --version  Show version number                                       [boolean]
   --help     Show help                                                 [boolean]
 ```
+
+## Configuration
+
+See example in `./assets/example-localzoo.yaml`

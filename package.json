@@ -1,6 +1,6 @@
 {
   "name": "localzoo",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Utility to run multiple microservices at localhost alongside with proxy",
   "author": "Andrii Sokolov <artas90@gmail.com>",
   "license": "GPL-3.0-or-later",
@@ -27,12 +27,12 @@
     "body-parser": "^1.19.0",
     "concurrently": "^5.1.0",
     "express": "^4.17.1",
-    "http-proxy": "^1.18.0",
+    "http-proxy": "^1.18.1",
     "http-proxy-rules": "^1.1.3",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.15",
     "wait-on": "^4.0.0",
-    "yargs": "^15.1.0"
+    "yargs": "^15.4.1"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.1",

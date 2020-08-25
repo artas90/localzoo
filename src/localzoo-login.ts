@@ -28,7 +28,7 @@ function redirectPost(url, data) {
   form.submit();
 };
 function objectify(storage) {
-  return Object.keys(storage).reduce((acc, key) => (acc[key] = JSON.stringify(storage.getItem(key)), acc), {});
+  return Object.keys(storage).reduce(function(acc, key) { acc[key] = JSON.stringify(storage.getItem(key)); return acc; }, {});
 };
 function getJsonData() {
   return { localStorageData: objectify(window.localStorage), sessionStorageData: objectify(window.sessionStorage) };
@@ -43,8 +43,11 @@ const welcomePageTmpl = template(`
   <strong>Drag the link to toolbar to create a shortcut:</strong><br/>
   <a href="javascript:<%= redrectBookmarklet %>">Redirect to localhost</a><br/><br/>
 
+  <strong>Open the following link in another tab/browser to restore session:</strong><br/>
+  <a href="http://localhost:<%= proxyPort %>/localzoo-login/restore">Restore session</a><br/><br/>
+
   <% if(uiProjects && uiProjects.length) { %>
-    Then go to any application:<br/><br/>
+    Shortcuts:<br/><br/>
   <% } %>
 
   <% uiProjects.forEach(function(project) { %>
@@ -61,7 +64,8 @@ const welcomePageTmpl = template(`
 `);
 const welcomePage = (argv: ISharedArgv) => welcomePageTmpl({
   redrectBookmarklet: redrectBookmarklet(argv),
-  uiProjects: getUiProjects(argv)
+  uiProjects: getUiProjects(argv),
+  proxyPort: argv.proxyPort
 });
 
 const STORAGE_DATA = {
@@ -75,11 +79,11 @@ const redirectPageTmpl = template(`
   const lsData = <%= localStorageData %>;
   const ssData = <%= sessionStorageData %>;
 
-  Object.keys(lsData).forEach(key => {
+  Object.keys(lsData).forEach(function(key) {
     localStorage.setItem(key, JSON.parse(lsData[key]));
   });
 
-  Object.keys(ssData).forEach(key => {
+  Object.keys(ssData).forEach(function(key) {
     sessionStorage.setItem(key, JSON.parse(ssData[key]));
   });
 
@@ -95,7 +99,7 @@ const redirectPage = (req: express.Request) => {
 
   return redirectPageTmpl(STORAGE_DATA);
 };
-const redirectPageCurrent = () => {
+const redirectPageRestore = () => {
   return redirectPageTmpl(STORAGE_DATA);
 };
 
@@ -104,10 +108,10 @@ const runLoginServer = (argv: ISharedArgv) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  app.get('/',                        (req, res) => { res.send(welcomePage(argv));     });
-  app.get('/localzoo-login',          (req, res) => { res.send(welcomePage(argv));     });
-  app.post('/localzoo-login',         (req, res) => { res.send(redirectPage(req));     });
-  app.get('/localzoo-login/current', (req, res) => { res.send(redirectPageCurrent()); });
+  app.get('/',                       (req, res) => { res.send(welcomePage(argv));     });
+  app.get('/localzoo-login',         (req, res) => { res.send(welcomePage(argv));     });
+  app.post('/localzoo-login',        (req, res) => { res.send(redirectPage(req));     });
+  app.get('/localzoo-login/restore', (req, res) => { res.send(redirectPageRestore()); });
 
   app.listen(argv.loginPort, () => {
     console.log(`\n${FgMagenta}Please open http://localhost:${argv.proxyPort}/localzoo-login and create a redirect button${ResetColors}\n`);

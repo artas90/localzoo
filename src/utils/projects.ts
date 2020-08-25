@@ -57,7 +57,7 @@ const addProjectInfo = (project: IProjectConfig, name: string, configFilePath: s
 
 const readProjectConfigs = (filePath: string): IProjectConfigMap | null =>
   existsSync(filePath)
-    ? mapValues(readYaml(filePath), (project, name) => addProjectInfo(project, name, filePath))
+    ? mapValues(readYaml(filePath) as any, (project, name) => addProjectInfo(project, name, filePath))
     : null;
 
 const isLabelOrName = (group: string[], cfg: IProjectConfig): boolean => {

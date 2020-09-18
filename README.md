@@ -27,4 +27,4 @@ Options:
 
 ## Configuration
 
-See example in `./assets/example-localzoo.yaml`
+See example in [./assets/example-localzoo.yaml](./assets/example-localzoo.yaml)

@@ -2,15 +2,25 @@
 import yargs from 'yargs';
 import express from 'express';
 import bodyParser from 'body-parser';
-import { template, filter, isEmpty } from 'lodash';
+import { template, filter, isEmpty, keys } from 'lodash';
 import { ISharedArgv, sharedArgvBuilder } from './utils/shared-argv';
 import { loadProjects, IProjectConfig } from './utils/projects';
 import { FgMagenta, ResetColors } from './utils/common';
+
+const STORAGE_DATA = {
+  localStorageData: '{}',
+  sessionStorageData: '{}'
+};
 
 const getUiProjects = (argv: ISharedArgv) =>
   filter(loadProjects(argv.group), (cfg: IProjectConfig) => !isEmpty(cfg.urlShortcuts) && !cfg.disabled);
 
 const bookmarklet = (code: string): string => code.trim().split('\n').map(line => line.trim()).join(' ');
+
+const storageKeysCount = (storage: string) => {
+  try { return keys(JSON.parse(storage)).length; }
+  catch { return 0; }
+};
 
 const redrectBookmarkletTmpl = template(`
 function redirectPost(url, data) {
@@ -39,39 +49,51 @@ const redrectBookmarklet = (argv: ISharedArgv) => bookmarklet(redrectBookmarklet
 
 const welcomePageTmpl = template(`
 <html>
-<body>
-  <strong>Drag the link to toolbar to create a shortcut:</strong><br/>
-  <a href="javascript:<%= redrectBookmarklet %>">Redirect to localhost</a><br/><br/>
+<body style="max-width: 600px; word-break: break-all;">
+  <div style="padding: 10px; border: 1px solid gray; margin-top: 10px;">
+    <em>Bookmarklets:</em><br/><br/>
 
-  <strong>Open the following link in another tab/browser to restore session:</strong><br/>
-  <a href="http://localhost:<%= proxyPort %>/localzoo-login/restore">Restore session</a><br/><br/>
+    <strong>Drag the link to toolbar to create a bookmarklet:</strong><br/>
+    <a href="javascript:<%= redrectBookmarklet %>">Redirect to localhost</a>
+  </div>
 
   <% if(uiProjects && uiProjects.length) { %>
-    Shortcuts:<br/><br/>
+    <div style="padding: 10px; border: 1px solid gray; margin-top: 10px;">
+      <em>Shortcuts:</em><br/><br/>
+
+      <% uiProjects.forEach(function(project) { %>
+        <strong><%= project.name %>:</strong>
+
+        <% project.urlShortcuts.forEach(function(shortcut) { %>
+          <br/><br/>
+          <span><%= shortcut.name %></span></br>
+          <a href="<%= shortcut.url %>"><%= shortcut.url %></a>
+        <% }); %>
+
+      <% }); %>
+    </div>
   <% } %>
 
-  <% uiProjects.forEach(function(project) { %>
-    <strong><%= project.name %></strong><br/><br/>
+  <div style="padding: 10px; border: 1px solid gray; margin-top: 10px;">
+    <em>Session:</em><br/><br/>
 
-    <% project.urlShortcuts.forEach(function(shortcut) { %>
-      <span><%= shortcut.name %></span></br>
-      <a href="<%= shortcut.url %>"><%= shortcut.url %></a><br/><br/>
-    <% }); %>
+    <strong>Open the following link to restore session:</strong><br/>
+    <a href="http://localhost:<%= proxyPort %>/localzoo-login/restore">Restore session</a><br/><br/>
 
-  <% }); %>
+    <strong>Current stored keys:</strong><br/>
+    localStorage: <%= localStorageKeysCount %><br/>
+    sessionStorage: <%= sessionStorageKeysCount %>
+  </div>
 </body>
 </html>
 `);
 const welcomePage = (argv: ISharedArgv) => welcomePageTmpl({
   redrectBookmarklet: redrectBookmarklet(argv),
   uiProjects: getUiProjects(argv),
-  proxyPort: argv.proxyPort
+  proxyPort: argv.proxyPort,
+  localStorageKeysCount: storageKeysCount(STORAGE_DATA.localStorageData),
+  sessionStorageKeysCount: storageKeysCount(STORAGE_DATA.sessionStorageData),
 });
-
-const STORAGE_DATA = {
-  localStorageData: '',
-  sessionStorageData: ''
-};
 
 const redirectPageTmpl = template(`
 <html>
